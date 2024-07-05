@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<robot name="golf tee">
+  <link name="golf tee">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.05"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.05"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.005"/>
+      <inertia ixx="0.000008" ixy="0.0" ixz="0.0" iyy="0.000008" iyz="0.0" izz="0.000008"/>
+    </inertial>
+  </link>
+</robot>

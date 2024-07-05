@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<robot name="object">
+  <link name="object1">
+    <visual>
+      <origin xyz="13.72 0 0.0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="13.72 0 0.0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="22.86 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="22.86 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="32.0 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="32.0 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="41.14 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="41.14 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="50.28 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="50.28 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="59.42 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="59.42 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="68.56 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="68.56 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="77.7 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="77.7 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="86.84 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="86.84 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="95.98 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="95.98 0 0"/>
+      <geometry>
+        <box size="0.05 2 0.5335" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

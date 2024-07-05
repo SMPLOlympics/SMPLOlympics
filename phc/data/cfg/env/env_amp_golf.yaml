@@ -1,0 +1,82 @@
+task: HumanoidGolf
+motion_file: "./sample_data/amass_isaac_simple_run_upright_slim.pkl"
+num_envs: 16
+env_spacing:  5
+episode_length: 300
+isFlagrun: False
+enable_debug_vis: False
+kp_scale: 1
+
+control_mode: "isaac_pd"
+power_reward: False
+power_usage_reward: False
+power_usage_coefficient: 0.01
+
+has_shape_obs: false
+has_shape_obs_disc: false
+has_shape_variation: False
+shape_resampling_interval: 250
+
+
+pdControl: True
+power_scale: 1.0
+controlFrequencyInv: 2 # 30 Hz
+stateInit: "Random"
+hybridInitProb: 0.5
+numAMPObsSteps: 10
+
+local_root_obs: True
+root_height_obs: True
+ampRootHeightObs: False
+key_bodies: ["R_Ankle", "L_Ankle", "R_Toe", "L_Toe", "R_Wrist",  "L_Wrist", "R_Hand",  "L_Hand"]
+contact_bodies: ["R_Ankle", "L_Ankle", "R_Toe", "L_Toe"]
+terminationHeight: 0.15
+enableEarlyTermination: True
+enableTaskObs: True
+
+terrain_obs: True
+terrain_obs_type: "square"
+terrain_obs_root: "head"
+use_center_height: true
+real_data_mesh: false
+
+terrain:
+  terrainType: trimesh # none, plane, or trimesh
+  staticFriction: 1.0  # [-]
+  dynamicFriction: 1.0  # [-]
+  restitution: 0.        # [-]
+  # rough terrain only:
+  curriculum: true
+  maxInitMapLevel: 0
+  mapLength: 12.
+  mapWidth: 12.
+  numLevels: 1
+  numTerrains: 1
+  # terrain types: [smooth slope, rough slope, stairs up, stairs down, discrete, stepping, poles, flat]
+  terrainProportions: [0.2, 0.1, 0.15, 0.15, 0.05, 0., 0.25, 0.1]
+  # terrainProportions: [0, 0, 0, 0., 0., 0., 1, 0]
+  # terrainProportions: [0, 0, 0, 0, 0, 0., 0, 1]
+  # tri mesh only:
+  slopeTreshold: 0.9
+
+plane:
+  staticFriction: 1.0
+  dynamicFriction: 1.0
+  restitution: 0.0
+
+sim:
+substeps: 2
+physx:
+  num_threads: 4
+  solver_type: 1  # 0: pgs, 1: tgs
+  num_position_iterations: 4
+  num_velocity_iterations: 0
+  contact_offset: 0.02
+  rest_offset: 0.0
+  bounce_threshold_velocity: 0.2
+  max_depenetration_velocity: 10.0
+  default_buffer_size_multiplier: 10.0
+
+flex:
+  num_inner_iterations: 10
+  warm_start: 0.25

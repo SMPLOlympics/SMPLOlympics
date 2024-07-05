@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<robot name="object">
+  <link name="object1">
+
+
+     <visual>
+      <origin xyz="20 4 0.5"/>
+      <geometry>
+        <box size="0.1 0.1 1" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    
+    <collision>
+      <origin xyz="20 4 0.5"/>
+      <geometry>
+        <box size="0.1 0.1 1" />
+      </geometry>
+    </collision>
+
+     <visual>
+      <origin xyz="20 8 0.5"/>
+      <geometry>
+        <box size="0.1 0.1 1" />
+      </geometry>
+      <material name="mat">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    
+    <collision>
+      <origin xyz="20 8 0.5"/>
+      <geometry>
+        <box size="0.1 0.1 1" />
+      </geometry>
+    </collision>
+    
+  </link>
+</robot>
