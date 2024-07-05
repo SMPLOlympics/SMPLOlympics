@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<robot name="golf ball">
+  <link name="golf ball">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.5"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.021"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.046"/>
+      <inertia ixx="0.000008" ixy="0.0" ixz="0.0" iyy="0.000008" iyz="0.0" izz="0.000008"/>
+    </inertial>
+  </link>
+</robot>

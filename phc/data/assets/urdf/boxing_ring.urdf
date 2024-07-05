@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<robot name="boxing_ring.urdf">
+  <link name="baseLink">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="10.0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="1.57079 0 0" xyz="0 -0.6 0"/>
+      <geometry>
+        <mesh filename="phc/data/assets/mesh/boxing_ring.obj" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.5"/>
+      <geometry>
+        <box size="5 5 1" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="wall1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="10.0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0 0"/>
+      <geometry>
+        <box size="0.05 5 1.4" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint_wall1" type="fixed">
+    <origin rpy="0 0 0" xyz="2.5 0 1.65"/>
+    <parent link="baseLink"/>
+    <child link="wall1"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="wall2">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="10.0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0 0"/>
+      <geometry>
+        <box size="0.05 5 1.4" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint_wall2" type="fixed">
+    <origin rpy="0 0 0" xyz="-2.5 0 1.65"/>
+    <parent link="baseLink"/>
+    <child link="wall2"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="wall3">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="10.0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0 0"/>
+      <geometry>
+        <box size="5 0.05 1.4" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint_wall3" type="fixed">
+    <origin rpy="0 0 0" xyz="0 -2.5 1.65"/>
+    <parent link="baseLink"/>
+    <child link="wall3"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="wall4">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="10.0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0 0"/>
+      <geometry>
+        <box size="5 0.05 1.4" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint_wall4" type="fixed">
+    <origin rpy="0 0 0" xyz="0 2.5 1.65"/>
+    <parent link="baseLink"/>
+    <child link="wall4"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+</robot>
