@@ -19,6 +19,10 @@
 
 - [ ] Complete instructions. 
 
+- [x] Release training data.
+
+- [x] Release training code. 
+
 
 ## Intallation 
 
