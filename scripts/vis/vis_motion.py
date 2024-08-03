@@ -66,7 +66,7 @@ if __name__ == "__main__":
     }
     smpl_robot = SMPL_Robot(
         robot_cfg,
-        data_dir="data/smpl",
+        data_dir="data/smpl/smplx",
     )
 
     # gender_beta = np.array([1.0000, -0.2141, -0.1140, 0.3848, 0.9583, 1.7619, 1.5040, 0.5765, 0.9636, 0.2636, -0.4202, 0.5075, -0.7371, -2.6490, 0.0867, 1.4699, -1.1865])

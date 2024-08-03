@@ -36,7 +36,7 @@ pip install -r requirement.txt
 
 2. Install [isaacgym](https://docs.nvidia.com/isaac/isaacgym/doc/setup.html)
 
-3. Download SMPL paramters from [SMPL](https://smpl.is.tue.mpg.de/). Put them in the `data/smpl` folder, unzip them into 'data/smpl' folder. Please download the v1.1.0 version, which contains the neutral humanoid. Rename the files `basicmodel_neutral_lbs_10_207_0_v1.1.0`, `basicmodel_m_lbs_10_207_0_v1.1.0.pkl`, `basicmodel_f_lbs_10_207_0_v1.1.0.pkl` to `SMPL_NEUTRAL.pkl`, `SMPL_MALE.pkl` and `SMPL_FEMALE.pkl`. Rename The file structure should look like this:
+3. Download SMPL paramters from [SMPL](https://smpl.is.tue.mpg.de/) and [SMPLX](https://smpl-x.is.tue.mpg.de/download.php). Put them in the `data/smpl` folder, unzip them into 'data/smpl' folder. For SMPL, please download the v1.1.0 version, which contains the neutral humanoid. Rename the files `basicmodel_neutral_lbs_10_207_0_v1.1.0`, `basicmodel_m_lbs_10_207_0_v1.1.0.pkl`, `basicmodel_f_lbs_10_207_0_v1.1.0.pkl` to `SMPL_NEUTRAL.pkl`, `SMPL_MALE.pkl` and `SMPL_FEMALE.pkl`. For SMPLX, please download the v1.1 version. Rename The file structure should look like this:
 
 ```
 
@@ -45,6 +45,9 @@ pip install -r requirement.txt
         |-- SMPL_FEMALE.pkl
         |-- SMPL_NEUTRAL.pkl
         |-- SMPL_MALE.pkl
+        |-- SMPLX_FEMALE.pkl
+        |-- SMPLX_NEUTRAL.pkl
+        |-- SMPLX_MALE.pkl
 
 ```
 
