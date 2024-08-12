@@ -12,6 +12,7 @@ gdown https://drive.google.com/uc?id=1S7_9LesLjfsFYqi4Ps6Sjzyuyun0Oaxi -O  outpu
 
 ###### Download sample video data
 gdown https://drive.google.com/uc?id=1BDUJ3nlub9tv1fF0UMANVUryJo1h5-lo -O  sample_data/ # amass_isaac_simple_run_upright_slim
+gdown https://drive.google.com/uc?id=1nwqBxljZ5sB_47vHDb3nxeNp27MTh5zK -O  sample_data/ # Tennis
 gdown https://drive.google.com/uc?id=1XvwTSeOb_0qZo9ADAp4ftiLrvm6JHJ4h -O  sample_data/ # Table Tennis
 gdown https://drive.google.com/uc?id=1lgzAup2qotweWDMxY9TygbRTea4jUZb0 -O  sample_data/ # Boxing
 gdown https://drive.google.com/uc?id=1fbieKIv6dFtv5Xr_0P6f_eXdnu-mhVpl -O  sample_data/ # Soccer
