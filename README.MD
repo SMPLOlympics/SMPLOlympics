@@ -60,7 +60,7 @@ bash download_data.sh
 
 For each sport, we provide bash scripts to train baselines models (PPO/AMP/PULSE/PULSE+AMP). All scripts are in the `scripts` folder. Please check the contents of the script and pick one command (sometimes out of four) for training. 
 
-To evaluate, append `no_virtual_display=False epoch=-1 test=True env.num_envs=1  headless=False ` to the end of the command. 
+To evaluate, append `no_virtual_display=True epoch=-1 test=True env.num_envs=1  headless=False ` to the end of the command. 
 
 
 ## Asset Attribution 
