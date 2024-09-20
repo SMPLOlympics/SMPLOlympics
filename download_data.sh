@@ -18,6 +18,7 @@ gdown https://drive.google.com/uc?id=1lgzAup2qotweWDMxY9TygbRTea4jUZb0 -O  sampl
 gdown https://drive.google.com/uc?id=1fbieKIv6dFtv5Xr_0P6f_eXdnu-mhVpl -O  sample_data/ # Soccer
 gdown https://drive.google.com/uc?id=1QKGGXMWjooNC4iJj0LWGC6iDd_cMP790 -O  sample_data/ # javelin_state
 gdown https://drive.google.com/uc?id=1ospAiML-R8nSDZJCGUfDpN0ghTSCQ0Qu -O  sample_data/ # javelin data
+gdown https://drive.google.com/uc?id=1vHyp83ukycg94hY65D8CnIrM14rFFO_Z -O  sample_data/ # javelin data
 gdown https://drive.google.com/uc?id=1M2IeDiPRnGUc9dMrUdm_FVClU5MptA2Q -O  sample_data/ # golf
 gdown https://drive.google.com/uc?id=1IN1zerTkEDn0RoeKtGn-2s3mxhJixUQl -O  sample_data/ # fencing
 gdown https://drive.google.com/uc?id=1d_cYa4i69Y_F8-6QoaC6vFWGON4q7ML3 -O  sample_data/ # freethrows states
