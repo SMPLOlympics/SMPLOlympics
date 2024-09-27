@@ -99,6 +99,7 @@ class MotionLibSMPL(MotionLibBase):
         # ZL: loading motion with the specified skeleton. Perfoming forward kinematics to get the joint positions
         max_len = config.max_length
         fix_height = config.fix_height
+        randomrize_heading = config.randomrize_heading
         
         np.random.seed( random.randint(0, 5000)* (pid + 1))
         res = {}
@@ -125,7 +126,7 @@ class MotionLibSMPL(MotionLibBase):
             pose_aa = to_torch(curr_file['pose_aa'][start:end]).reshape(B, J, -1)
 
             ##### ZL: randomize the heading ######
-            if (not flags.im_eval) and (not flags.test):
+            if (not flags.im_eval) and (not flags.test) and randomrize_heading:
                 random_rot = np.zeros(3)
                 random_rot[2] = np.pi * (2 * np.random.random() - 1.0)
                 random_heading_rot = sRot.from_euler("xyz", random_rot)

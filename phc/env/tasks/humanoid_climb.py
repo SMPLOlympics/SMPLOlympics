@@ -5,6 +5,7 @@ import env.tasks.humanoid_amp as humanoid_amp
 import env.tasks.humanoid_amp_task as humanoid_amp_task
 from utils import torch_utils
 
+import numpy as np
 from isaacgym import gymapi
 from isaacgym import gymtorch
 from isaacgym.torch_utils import *
@@ -31,9 +32,12 @@ class HumanoidClimb(humanoid_amp_task.HumanoidAMPTask):
         self.power_usage_coefficient = cfg["env"].get("power_usage_coefficient", 0.0025)
         self.power_acc = torch.zeros((self.num_envs, 2)).to(self.device)
         
-        self._build_climbing_wall()
+        self._prev_root_pos_list = []
+        for i in range(self.num_agents):
+            self._prev_root_pos_list.append(torch.zeros([self.num_envs, 3], device=self.device, dtype=torch.float))
+        
         # self.set_initial_root_state()
-        self.goal = torch.tensor([0, 0, 20]).to(self.device)  # Goal is 20 meters high
+        self.goal = torch.tensor([0, -0.5, 4]).to(self.device)  # Goal is 20 meters high
         
         self.statistics = False
         if flags.test:
@@ -62,27 +66,49 @@ class HumanoidClimb(humanoid_amp_task.HumanoidAMPTask):
         initial_root_states[..., 3:7] = torch.tensor([0, 0, 0, 1])  # rotation to face the wall
         self._initial_humanoid_root_states = initial_root_states
 
-    def _build_climbing_wall(self):
-        # Load the climbing wall asset
+    def _create_envs(self, num_envs, spacing, num_per_row):
+        self._target_handles = []
+        self._load_target_asset()
+
+        super()._create_envs(num_envs, spacing, num_per_row)
+        return
+
+    def _build_env(self, env_id, env_ptr, humanoid_asset_list):
+        super()._build_env(env_id, env_ptr, humanoid_asset_list)
+        self._build_target(env_id, env_ptr)
+        return
+
+    
+    def _load_target_asset(self): 
+        
+
         asset_root = "phc/data/assets/urdf/"
-        wall_asset_file = "climbing_wall.urdf"
+        asset_file = "climbing_wall.urdf"
+
         asset_options = gymapi.AssetOptions()
+        asset_options.density = 1000.0
+        asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
         asset_options.fix_base_link = True
-        asset_options.flip_visual_attachments = False
-        asset_options.use_mesh_materials = True
+        self._wall_asset = self.gym.load_asset(self.sim, asset_root, asset_file, asset_options)
+        
+        return
 
-        wall_asset = self.gym.load_asset(self.sim, asset_root, wall_asset_file, asset_options)
-
-        # Set the wall pose
-        wall_pose = gymapi.Transform()
-        wall_pose.p = gymapi.Vec3(0.5, 0, 10)  # position the wall
-        wall_pose.r = gymapi.Quat.from_axis_angle(gymapi.Vec3(0, 1, 0), np.pi)  # rotate to face the humanoid
-
-        # Create the wall actor in each environment
-        for i in range(self.num_envs):
-            wall_handle = self.gym.create_actor(self.envs[i], wall_asset, wall_pose, "wall", i, 2)
-            self.gym.set_rigid_body_color(self.envs[i], wall_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0.8, 0.8, 0.8))
-
+    def _build_target(self, env_id, env_ptr):
+        
+        default_pose = gymapi.Transform()
+        default_pose.p = gymapi.Vec3(0, -0.5, 0.0)  
+        default_pose.r = gymapi.Quat.from_euler_zyx(0.0, 0.0, 0)  # Rotate if needed
+        target_handle = self.gym.create_actor(env_ptr, self._wall_asset, default_pose, "target", env_id, 0)
+        
+        return 
+        
+    def _build_target_tensors(self):
+        num_actors = self.get_num_actors_per_env()
+        self._target_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., self.num_agents, :]
+        
+        self._tar_actor_ids = to_torch(num_actors * np.arange(self.num_envs), device=self.device, dtype=torch.int32) + self.num_agents
+        return
+    
     def get_task_obs_size(self):
         obs_size = 0
         if self._enable_task_obs:
@@ -90,25 +116,48 @@ class HumanoidClimb(humanoid_amp_task.HumanoidAMPTask):
         return obs_size
 
     def _compute_task_obs(self, env_ids=None):
-        if env_ids is None:
-            root_states = self._humanoid_root_states
-        else:
-            root_states = self._humanoid_root_states[env_ids]
+        obs_list = []
+
+        for i in range(self.num_agents):
+            if env_ids is None:
+                root_states = self._humanoid_root_states_list[i]
+            else:
+                root_states = self._humanoid_root_states_list[i][env_ids]
+            
+            obs = compute_climb_observations(root_states, self.goal)
+            obs_list.append(obs)
         
-        obs = compute_climb_observations(root_states, self.goal)
-        return obs
+        return obs_list
 
     def _compute_reward(self, actions):
-        root_states = self._humanoid_root_states
-        self.rew_buf[:] = compute_climb_reward(root_states, self._prev_root_pos, self.goal, self.dt)
-        self._prev_root_pos[:] = root_states[:, 0:3]
+        for i in range(self.num_agents):
+            root_states = self._humanoid_root_states_list[i]
+            key_bodies_pos = self._rigid_body_pos_list[i][:, self._key_body_ids[:2], :]
+            self.rew_buf[i*self.num_envs:(i+1)*self.num_envs] = compute_climb_reward(
+                root_states, 
+                self._prev_root_pos_list[i], 
+                self.goal, 
+                self.dt
+            )
+
+        return
+    
+    def pre_physics_step(self, actions):
+        super().pre_physics_step(actions)
+        
+        for i in range(self.num_agents):
+            self._prev_root_pos_list[i] = self._humanoid_root_states_list[i][..., 0:3].clone()
+
         return
 
     def _compute_reset(self):
+        
         self.reset_buf[:], self._terminate_buf[:] = compute_humanoid_reset(self.reset_buf, self.progress_buf,
-                                                           self._contact_forces, self._contact_body_ids,
-                                                           self._rigid_body_pos, self.max_episode_length,
-                                                           self._enable_early_termination, self._termination_heights)
+                                                           self._contact_forces_list, self._contact_body_ids,
+                                                           self._rigid_body_pos_list, self.max_episode_length,
+                                                           self._enable_early_termination, self._termination_heights, self.num_agents)
+        
+        return
 
     def post_physics_step(self):
         super().post_physics_step()
@@ -149,12 +198,12 @@ def compute_climb_observations(root_states, goal):
     heading_rot = torch_utils.calc_heading_quat_inv(root_rot)
     
     dist_to_goal = goal - root_pos
-    dist_to_goal_local = quat_rotate(heading_rot, dist_to_goal)
+    dist_to_goal_local = torch_utils.my_quat_rotate(heading_rot, dist_to_goal)
     
     obs = torch.cat([
         dist_to_goal_local,
         root_pos[:, 2:3],  # current height
-        torch.tensor([1.0, 0.0]).repeat(root_states.shape[0], 1)  # wall normal (assuming it's always [1, 0])
+        torch.tensor([1.0, 0.0]).repeat(root_states.shape[0], 1).to(root_states.device)  # wall normal (assuming it's always [1, 0])
     ], dim=-1)
     
     return obs
@@ -176,3 +225,63 @@ def compute_climb_reward(root_states, prev_root_pos, goal, dt):
     total_reward = height_reward + goal_reward + direction_reward
     
     return total_reward
+
+
+# @torch.jit.script
+def compute_humanoid_reset(reset_buf, progress_buf, contact_buf_list, contact_body_ids, rigid_body_pos_list,
+                           max_episode_length,
+                           enable_early_termination, termination_heights, num_agents):
+    # type: (Tensor, Tensor, list, Tensor, list, float, bool, Tensor, int) -> Tuple[Tensor, Tensor]
+    contact_force_threshold = 50.0
+    
+    terminated = torch.zeros_like(reset_buf)
+
+    if (enable_early_termination):
+        masked_contact_buf = contact_buf_list[0].clone()
+        
+        masked_contact_buf[:, contact_body_ids, :] = 0
+        force_threshold = 50
+        fall_contact = torch.sqrt(torch.square(torch.abs(masked_contact_buf.sum(dim=-2))).sum(dim=-1)) > force_threshold
+
+        body_height = rigid_body_pos_list[0][..., 2]
+        fall_height = body_height < termination_heights
+        fall_height[:, contact_body_ids] = False
+        fall_height = torch.any(fall_height, dim=-1)
+
+        body_y = rigid_body_pos_list[0][..., 0, 1]
+        body_out = torch.abs(body_y)>0.8
+        
+        has_fallen = torch.logical_or(fall_contact, fall_height) # don't touch the hurdle. 
+        has_fallen = torch.logical_or(has_fallen, body_out)
+
+
+        if num_agents>1:
+            for i in range(1, num_agents):
+                masked_contact_buf = contact_buf_list[i].clone()
+                masked_contact_buf[:, contact_body_ids, :] = 0
+                force_threshold = 50
+                fall_contact = torch.sqrt(torch.square(torch.abs(masked_contact_buf.sum(dim=-2))).sum(dim=-1)) > force_threshold
+
+                body_height = rigid_body_pos_list[i][..., 2]
+                fall_height = body_height < termination_heights
+                fall_height[:, contact_body_ids] = False
+                fall_height = torch.any(fall_height, dim=-1)
+
+                has_fallen_temp = torch.logical_or(fall_contact, fall_height)
+
+                has_fallen = torch.logical_or(has_fallen, has_fallen_temp)
+
+                body_y = rigid_body_pos_list[i][..., 0, 1]
+                body_out = torch.abs(body_y)>0.8
+            
+                has_fallen = torch.logical_or(has_fallen, body_out)
+
+        has_failed = has_fallen
+        # first timestep can sometimes still have nonzero contact forces
+        # so only check after first couple of steps
+        has_failed *= (progress_buf > 1)
+        terminated = torch.where(has_failed, torch.ones_like(reset_buf), terminated)
+        
+    reset = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), terminated)
+
+    return reset, terminated
