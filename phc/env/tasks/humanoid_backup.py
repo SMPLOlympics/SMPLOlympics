@@ -45,9 +45,9 @@ from smpl_sim.smpllib.smpl_local_robot import SMPL_Robot
 from phc.utils.flags import flags
 from phc.env.tasks.base_task import BaseTask
 from tqdm import tqdm
-from poselib.poselib.skeleton.skeleton3d import SkeletonTree
+from smpl_sim.poselib.skeleton.skeleton3d import SkeletonTree
 from collections import defaultdict
-from poselib.poselib.skeleton.skeleton3d import SkeletonMotion, SkeletonState
+from smpl_sim.poselib.skeleton.skeleton3d import SkeletonMotion, SkeletonState
 from scipy.spatial.transform import Rotation as sRot
 import gc
 import torch.multiprocessing as mp

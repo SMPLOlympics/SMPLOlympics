@@ -23,7 +23,7 @@ from isaacgym import gymapi, gymutil, gymtorch
 import torch
 from phc.utils.motion_lib_smpl import MotionLibSMPL as MotionLibSMPL
 from smpl_sim.smpllib.smpl_local_robot import SMPL_Robot
-from poselib.poselib.skeleton.skeleton3d import SkeletonTree
+from smpl_sim.poselib.skeleton.skeleton3d import SkeletonTree
 from phc.utils.flags import flags
 from phc.utils.motion_lib_base import FixHeightMode
 from easydict import EasyDict

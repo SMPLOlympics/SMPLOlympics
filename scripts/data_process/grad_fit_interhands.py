@@ -10,7 +10,7 @@ import joblib
 from smpl_sim.smpllib.torch_smpl_humanoid_batch import Humanoid_Batch
 import numpy as np
 from scipy.spatial.transform import Rotation as sRot
-from poselib.poselib.skeleton.skeleton3d import SkeletonTree, SkeletonMotion, SkeletonState
+from smpl_sim.poselib.skeleton.skeleton3d import SkeletonTree, SkeletonMotion, SkeletonState
 from collections import defaultdict
 
 from torch.autograd import Variable

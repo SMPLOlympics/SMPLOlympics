@@ -17,7 +17,7 @@ from enum import Enum
 
 from smpl_sim.smpllib.smpl_local_robot import SMPL_Robot
 from tqdm import tqdm
-from poselib.poselib.skeleton.skeleton3d import SkeletonTree
+from smpl_sim.poselib.skeleton.skeleton3d import SkeletonTree
 import torch.multiprocessing as mp
 
 

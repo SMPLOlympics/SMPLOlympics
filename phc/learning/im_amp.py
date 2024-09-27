@@ -36,7 +36,7 @@ from smpl_sim.smpllib.smpl_eval import compute_metrics_lite
 from tqdm import tqdm
 
 from phc.utils import torch_utils
-import poselib.poselib.core.rotation3d as rot3d
+import smpl_sim.poselib.core.rotation3d as rot3d
 
 class IMAmpAgent(amp_agent.AMPAgent):
     def __init__(self, base_name, config):

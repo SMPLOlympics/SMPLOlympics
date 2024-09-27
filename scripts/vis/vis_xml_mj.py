@@ -8,7 +8,7 @@ import os.path as osp
 sys.path.append(os.getcwd())
 
 from phc.utils.motion_lib_smpl import MotionLibSMPL
-from poselib.poselib.skeleton.skeleton3d import SkeletonTree
+from smpl_sim.poselib.skeleton.skeleton3d import SkeletonTree
 import torch
 
 import numpy as np

@@ -9,7 +9,7 @@ from smpl_sim.utils.torch_ext import dict_to_torch
 
 sys.path.append(os.getcwd())
 
-from poselib.poselib.core.rotation3d import transform_mul
+from smpl_sim.poselib.core.rotation3d import transform_mul
 
 
 class Humanoid_Batch:
