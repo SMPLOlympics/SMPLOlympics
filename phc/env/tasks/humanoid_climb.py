@@ -11,6 +11,7 @@ from isaacgym.torch_utils import *
 from scipy.spatial.transform import Rotation as sRot
 from phc.utils.flags import flags
 from enum import Enum
+from poselib.poselib.core.rotation3d import quat_inverse, quat_mul
 
 TAR_ACTOR_ID = 1
 
@@ -31,7 +32,7 @@ class HumanoidClimb(humanoid_amp_task.HumanoidAMPTask):
         self.power_acc = torch.zeros((self.num_envs, 2)).to(self.device)
         
         self._build_climbing_wall()
-        self.set_initial_root_state()
+        # self.set_initial_root_state()
         self.goal = torch.tensor([0, 0, 20]).to(self.device)  # Goal is 20 meters high
         
         self.statistics = False
@@ -62,16 +63,22 @@ class HumanoidClimb(humanoid_amp_task.HumanoidAMPTask):
         self._initial_humanoid_root_states = initial_root_states
 
     def _build_climbing_wall(self):
-        # Create a vertical wall for climbing
-        wall_dims = gymapi.Vec3(0.1, 5, 20)  # thin, wide, tall wall
-        wall_pose = gymapi.Transform()
-        wall_pose.p = gymapi.Vec3(0.5, 0, 10)  # position the wall
-        
+        # Load the climbing wall asset
+        asset_root = "phc/data/assets/urdf/"
+        wall_asset_file = "climbing_wall.urdf"
         asset_options = gymapi.AssetOptions()
         asset_options.fix_base_link = True
-        
-        wall_asset = self.gym.create_box(self.sim, wall_dims.x, wall_dims.y, wall_dims.z, asset_options)
-        
+        asset_options.flip_visual_attachments = False
+        asset_options.use_mesh_materials = True
+
+        wall_asset = self.gym.load_asset(self.sim, asset_root, wall_asset_file, asset_options)
+
+        # Set the wall pose
+        wall_pose = gymapi.Transform()
+        wall_pose.p = gymapi.Vec3(0.5, 0, 10)  # position the wall
+        wall_pose.r = gymapi.Quat.from_axis_angle(gymapi.Vec3(0, 1, 0), np.pi)  # rotate to face the humanoid
+
+        # Create the wall actor in each environment
         for i in range(self.num_envs):
             wall_handle = self.gym.create_actor(self.envs[i], wall_asset, wall_pose, "wall", i, 2)
             self.gym.set_rigid_body_color(self.envs[i], wall_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0.8, 0.8, 0.8))
@@ -118,6 +125,22 @@ class HumanoidClimb(humanoid_amp_task.HumanoidAMPTask):
         self.reach_goal_flag += (root_pos[:, 2] > self.goal[2]).float()
         
         self.time_result.append(self.progress_buf[self.reach_goal_flag == 1].clone())
+        
+class HumanoidClimbZ(HumanoidClimb):
+    def __init__(self, cfg, sim_params, physics_engine, device_type, device_id, headless):
+        super().__init__(cfg=cfg, sim_params=sim_params, physics_engine=physics_engine, device_type=device_type, device_id=device_id, headless=headless)
+        self.initialize_z_models()
+        return
+    
+    def step(self, actions):
+        super().step_z(actions)
+        return
+    
+    def _setup_character_props(self, key_bodies):
+        super()._setup_character_props(key_bodies)
+        super()._setup_character_props_z()
+        return
+
 
 def compute_climb_observations(root_states, goal):
     root_pos = root_states[:, 0:3]

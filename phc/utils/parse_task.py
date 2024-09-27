@@ -53,6 +53,7 @@ from phc.env.tasks.humanoid_javelin import HumanoidJavelin, HumanoidJavelinZ
 from phc.env.tasks.humanoid_golf import HumanoidGolf, HumanoidGolfZ
 from phc.env.tasks.humanoid_longjump import HumanoidLongjump, HumanoidLongjumpZ
 from phc.env.tasks.humanoid_highjump import HumanoidHighjump, HumanoidHighjumpZ
+from phc.env.tasks.humanoid_climb import HumanoidClimb, HumanoidClimbZ
 
 from isaacgym import rlgpu
 
