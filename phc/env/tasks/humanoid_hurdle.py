@@ -177,8 +177,8 @@ class HumanoidHurdle(humanoid_amp_task.HumanoidAMPTask):
     
     def _reset_env_tensors(self, env_ids):
         
-        
-        self.distance_result.append(self.distance_buffer[env_ids].clone())
+        if self.statistics:
+            self.distance_result.append(self.distance_buffer[env_ids].clone())
         
         self.distance_buffer[env_ids] = 0
         self.pass_line_flag[env_ids] = 0
