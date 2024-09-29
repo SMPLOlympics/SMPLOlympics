@@ -390,7 +390,7 @@ class HumanoidBasketball(humanoid_amp_task.HumanoidAMPTask):
             goal_pos = self.goal_pos_red if i % 2 == 0 else self.goal_pos_green
             target_pos_in_goal = goal_pos.view(1, -1) + self._goal_offsets
             
-            reward, reward_raw = compute_basketball_reward(self._target_states, char_root_state, goal_pos, hand_pos, target_pos_in_goal, self._prev_ball_pos, self._prev_root_pos_list[i], self.dt)
+            reward, self.reward_raw = compute_basketball_reward(self._target_states, char_root_state, goal_pos, hand_pos, target_pos_in_goal, self._prev_ball_pos, self._prev_root_pos_list[i], self.dt)
             
             self.rew_buf[i*self.num_envs:(i+1)*self.num_envs] = reward
             
