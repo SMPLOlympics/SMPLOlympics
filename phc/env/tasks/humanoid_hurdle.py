@@ -52,9 +52,9 @@ class HumanoidHurdle(humanoid_amp_task.HumanoidAMPTask):
                                              [86.84,0,1.067],[95.98,0,1.067]])[:,None,:].repeat(1,self.num_envs,1).to(self.device)
         self.tar_speed = 4
         self.statistics = False
-        if flags.test:
-            self._enable_early_termination = False
-            self.statistics = True
+        # if flags.test:
+        #     self._enable_early_termination = False
+        #     self.statistics = True
             
         if self.statistics:
             self.build_statistics_tensor()
@@ -237,7 +237,6 @@ class HumanoidHurdle(humanoid_amp_task.HumanoidAMPTask):
         return
 
     def _compute_reset(self):
-        
         self.reset_buf[:], self._terminate_buf[:] = compute_humanoid_reset(self.reset_buf, self.progress_buf,
                                                            self._contact_forces_list, self._contact_body_ids,
                                                            self._rigid_body_pos_list, self.max_episode_length,
@@ -386,7 +385,7 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf_list, contact_bo
     contact_force_threshold = 50.0
     
     terminated = torch.zeros_like(reset_buf)
-
+    
     if (enable_early_termination):
         masked_contact_buf = contact_buf_list[0].clone()
         
@@ -404,7 +403,7 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf_list, contact_bo
         
         has_fallen = torch.logical_or(fall_contact, fall_height) # don't touch the hurdle. 
         has_fallen = torch.logical_or(has_fallen, body_out)
-
+        
 
         if num_agents>1:
             for i in range(1, num_agents):

@@ -42,7 +42,6 @@ class Humanoid_Batch:
         
         
         self.num_dof = len(motors) 
-        self._remove_idx = 0
         self.num_extend_dof = self.num_dof
         
         self.mjcf_data = mjcf_data = self.from_mjcf(self.mjcf_file)
@@ -77,7 +76,6 @@ class Humanoid_Batch:
             self._parents = torch.cat([self._parents, torch.tensor([self.body_names.index(extend_config.parent_name)]).to(device)], dim = 0)
             self._offsets = torch.cat([self._offsets, torch.tensor([[extend_config.pos]]).to(device)], dim = 1)
             self._local_rotation = torch.cat([self._local_rotation, torch.tensor([[extend_config.rot]]).to(device)], dim = 1)
-            self._remove_idx += 1
             self.num_extend_dof += 1
             
         self.num_bodies = len(self.body_names)
@@ -183,9 +181,9 @@ class Humanoid_Batch:
             return_dict.global_rotation_mat_extend = wbody_mat.clone()
             return_dict.global_rotation_extend = wbody_rot
             
-            wbody_pos = wbody_pos[..., :-self._remove_idx, :]
-            wbody_mat = wbody_mat[..., :-self._remove_idx, :, :]
-            wbody_rot = wbody_rot[..., :-self._remove_idx, :]
+            wbody_pos = wbody_pos[..., :self.num_bodies, :]
+            wbody_mat = wbody_mat[..., :self.num_bodies, :, :]
+            wbody_rot = wbody_rot[..., :self.num_bodies, :]
 
         
         return_dict.global_translation = wbody_pos
@@ -202,7 +200,7 @@ class Humanoid_Batch:
             return_dict.global_velocity = rigidbody_linear_velocity
             
             if len(self.cfg.extend_config) > 0:
-                return_dict.dof_pos = pose.sum(dim = -1)[..., 1:-self._remove_idx] # you can sum it up since unitree's each joint has 1 dof. Last two are for hands. doesn't really matter. 
+                return_dict.dof_pos = pose.sum(dim = -1)[..., 1:self.num_bodies] # you can sum it up since unitree's each joint has 1 dof. Last two are for hands. doesn't really matter. 
             else:
                 if not len(self.actuated_joints_idx) == len(self.body_names):
                     return_dict.dof_pos = pose.sum(dim = -1)[..., self.actuated_joints_idx]
@@ -348,7 +346,7 @@ class Humanoid_Batch:
             fk_res = self.fk_batch(torch.zeros(1, 1, len(self.body_names_augment), 3), torch.zeros(1, 1, 3))
         else:
             fk_res = self.fk_batch(pose, trans)
-            
+        
         g_trans = fk_res.global_translation.squeeze()
         g_rot = fk_res.global_rotation_mat.squeeze()
         geoms = self.tree.find("worldbody").findall(".//geom")
@@ -362,8 +360,8 @@ class Humanoid_Batch:
             k = self.mesh_to_body[geom].attrib['name']
             mesh_names = self.body_to_mesh[k]
             body_idx = self.body_names.index(k)
-            body_trans = g_trans[body_idx].numpy().copy()
             
+            body_trans = g_trans[body_idx].numpy().copy()
             body_rot = g_rot[body_idx].numpy().copy()
             for mesh_name in mesh_names:
                 mesh_obj = copy.deepcopy(self.mesh_dict[mesh_name])
