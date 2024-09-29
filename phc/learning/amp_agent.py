@@ -665,23 +665,22 @@ class AMPAgent(common_agent.CommonAgent):
     def pre_epoch(self, epoch_num):
         # print("freeze running mean/std")
 
-        if self.vec_env.env.task.humanoid_type in ["smpl", "smplh", "smplx"]:
-            humanoid_env = self.vec_env.env.task
-            if (epoch_num > 1) and epoch_num % humanoid_env.shape_resampling_interval == 1: # + 1 to evade the evaluations. 
-            # if (epoch_num > 0) and epoch_num % humanoid_env.shape_resampling_interval == 0 and not (epoch_num % (self.save_freq)): # Remove the resampling for this. 
-                # Different from AMP, always resample motion no matter the motion type.
-                print("Resampling Shape")
-                humanoid_env.resample_motions()
-                # self.current_rewards # Fixing these values such that they do not get whacked by the
-                # self.current_lengths
-            if humanoid_env.getup_schedule:
-                humanoid_env.update_getup_schedule(epoch_num, getup_udpate_epoch=humanoid_env.getup_udpate_epoch)
-                if epoch_num > humanoid_env.getup_udpate_epoch:  # ZL fix janky hack
-                    self._task_reward_w = 0.5
-                    self._disc_reward_w = 0.5
-                else:
-                    self._task_reward_w = 0
-                    self._disc_reward_w = 1
+        humanoid_env = self.vec_env.env.task
+        if (epoch_num > 1) and epoch_num % humanoid_env.shape_resampling_interval == 1: # + 1 to evade the evaluations. 
+        # if (epoch_num > 0) and epoch_num % humanoid_env.shape_resampling_interval == 0 and not (epoch_num % (self.save_freq)): # Remove the resampling for this. 
+            # Different from AMP, always resample motion no matter the motion type.
+            print("Resampling Shape")
+            humanoid_env.resample_motions()
+            # self.current_rewards # Fixing these values such that they do not get whacked by the
+            # self.current_lengths
+        if humanoid_env.getup_schedule:
+            humanoid_env.update_getup_schedule(epoch_num, getup_udpate_epoch=humanoid_env.getup_udpate_epoch)
+            if epoch_num > humanoid_env.getup_udpate_epoch:  # ZL fix janky hack
+                self._task_reward_w = 0.5
+                self._disc_reward_w = 0.5
+            else:
+                self._task_reward_w = 0
+                self._disc_reward_w = 1
 
         self.running_mean_std_temp = copy.deepcopy(self.running_mean_std)  # Freeze running mean/std, so that the actor does not use the updated mean/std
         self.running_mean_std_temp.freeze()

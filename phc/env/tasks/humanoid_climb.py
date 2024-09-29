@@ -40,9 +40,9 @@ class HumanoidClimb(humanoid_amp_task.HumanoidAMPTask):
         self.goal = torch.tensor([0, -0.5, 4]).to(self.device)  # Goal is 20 meters high
         
         self.statistics = False
-        if flags.test:
-            self._enable_early_termination = False
-            self.statistics = True
+        # if flags.test:
+        #     self._enable_early_termination = False
+        #     self.statistics = True
             
         if self.statistics:
             self.build_statistics_tensor()
@@ -210,21 +210,29 @@ def compute_climb_observations(root_states, goal):
 
 def compute_climb_reward(root_states, prev_root_pos, goal, dt):
     root_pos = root_states[:, 0:3]
+    root_vel = root_states[:, 7:10]
     
-    # Height reward
-    height_diff = root_pos[:, 2] - prev_root_pos[:, 2]
-    height_reward = torch.clamp(height_diff / dt, min=0) * 2.0
     
-    # Goal distance reward
+    # Goal distance reward (30% of total reward)
     dist_to_goal = torch.norm(goal - root_pos, dim=-1)
-    goal_reward = 1.0 / (1.0 + dist_to_goal)
+    goal_reward =  torch.exp(-10 * dist_to_goal)
     
-    # Climbing direction reward
-    direction_reward = torch.clamp(root_pos[:, 0], max=0) * 0.1  # penalize moving away from the wall
+    # Climbing direction reward (10% of total reward)
+    direction_reward = torch.clamp(root_pos[:, 0], max=0) 
     
-    total_reward = height_reward + goal_reward + direction_reward
     
-    return total_reward
+    # Weighting
+    w_goal = 0.8
+    w_direction = 0.2
+    
+    reward = goal_reward * w_goal + direction_reward * w_direction
+    
+    return reward
+
+def is_touching_wall(contact_forces, contact_body_ids):
+    wall_contact_threshold = 1.0  # Adjust this value as needed
+    wall_contact_forces = contact_forces[:, contact_body_ids, 0]  # Assuming the wall is in the x-direction
+    return torch.any(torch.abs(wall_contact_forces) > wall_contact_threshold, dim=-1)
 
 
 # @torch.jit.script
@@ -253,7 +261,7 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf_list, contact_bo
         
         has_fallen = torch.logical_or(fall_contact, fall_height) # don't touch the hurdle. 
         has_fallen = torch.logical_or(has_fallen, body_out)
-
+        
 
         if num_agents>1:
             for i in range(1, num_agents):
@@ -275,8 +283,16 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf_list, contact_bo
                 body_out = torch.abs(body_y)>0.8
             
                 has_fallen = torch.logical_or(has_fallen, body_out)
-
+        
         has_failed = has_fallen
+        
+        touching_wall = is_touching_wall(contact_buf_list[0].clone(), contact_body_ids)
+        # Terminate if not touching the wall after a certain height
+        min_wall_contact_height = 1.2  # Adjust this value as needed
+        should_touch_wall = rigid_body_pos_list[0][..., 0, 2] > min_wall_contact_height
+        not_touching_wall_when_should = should_touch_wall & ~touching_wall
+        
+        has_failed = torch.logical_or(has_failed, not_touching_wall_when_should)
         # first timestep can sometimes still have nonzero contact forces
         # so only check after first couple of steps
         has_failed *= (progress_buf > 1)

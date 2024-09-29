@@ -61,7 +61,6 @@ class HumanoidAMPTask(humanoid_amp.HumanoidAMP):
             
             
         for i in range(self.num_agents):
-            
             self.obs_buf[env_ids+i*self.num_envs] = torch.cat([humanoid_obs_list[i], task_obs_list[i]],dim=-1)
         # time.sleep(5)
         # else:
