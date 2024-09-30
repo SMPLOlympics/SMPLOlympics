@@ -20,7 +20,7 @@ shape_resampling_interval: 250
 
 pdControl: True
 power_scale: 1.0
-controlFrequencyInv: 2 # 30 Hz
+
 stateInit: "Default"
 hybridInitProb: 0.5
 numAMPObsSteps: 10

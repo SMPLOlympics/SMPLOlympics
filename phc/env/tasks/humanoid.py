@@ -87,7 +87,7 @@ class Humanoid(BaseTask):
         self.num_agents = self.cfg["num_agents"]
         self.load_humanoid_configs(cfg)
 
-        self.control_mode = self.cfg["env"]["control_mode"]
+        self.control_mode = self.cfg["control"]["control_mode"]
         if self.control_mode in ['isaac_pd']:
             self._pd_control = True
         else:
@@ -1039,7 +1039,7 @@ class Humanoid(BaseTask):
         self.dof_limits_upper = to_torch(self.dof_limits_upper, device=self.device)
         
         if self.control_mode == "pd":
-            self.torque_limits = torch.ones_like(self.dof_limits_upper) * 1000 # ZL: hacking 
+            self.torque_limits = torch.ones_like(self.dof_limits_upper) * 350 # ZL: hacking 
 
         if self.control_mode in ["pd", "isaac_pd"]:
             self._build_pd_action_offset_scale()
@@ -1452,6 +1452,7 @@ class Humanoid(BaseTask):
     def pre_physics_step(self, actions):
         # if flags.debug:
             # actions *= 0
+        
         self.actions = actions.to(self.device).clone()
         if len(self.actions.shape) == 1:
             self.actions = self.actions[None, ]
@@ -1475,7 +1476,7 @@ class Humanoid(BaseTask):
                 pd_tar = self._action_to_pd_targets(self.actions)
                 
             self.actions = pd_tar
-            chunks = torch.chunk(pd_tar, self.num_agents, dim=0)
+            chunks = torch.chunk(pd_tar, self.num_agents, dim=0) # chunking based on the number of agents
             pd_tar= torch.cat(chunks, dim=-1)
             # pd_tar_tensor = gymtorch.unwrap_tensor(pd_tar)
             # for i in range
@@ -1489,7 +1490,10 @@ class Humanoid(BaseTask):
                 force_tensor = gymtorch.unwrap_tensor(forces)
                 self.gym.set_dof_actuation_force_tensor(self.sim, force_tensor)
             elif self.control_mode == "pd":
-                self.pd_tar = self._action_to_pd_targets(self.actions)
+                chunks = torch.chunk(self.actions, self.num_agents, dim=0) # chunking based on the number of agents
+                pd_tar= torch.cat(chunks, dim=-1)
+                
+                self.pd_tar = self._action_to_pd_targets(pd_tar)
         return
     
     
@@ -1503,10 +1507,11 @@ class Humanoid(BaseTask):
             [torch.Tensor]: Torques sent to the simulation
         """
         #pd controller
-        action_scale = 1
         control_type = "P" # self.cfg.control.control_type
+        actions_scaled = actions * self.cfg.control.action_scale 
+        
         if control_type=="P": # default 
-            torques = self.kp_gains*(actions - self._dof_pos) - self.kd_gains*self._dof_vel
+            torques = self.p_gains*(actions_scaled + self.default_dof_pos - torch.cat(self._dof_pos_list, dim = 0)) - self.d_gains*torch.cat(self._dof_vel_list, dim = 0)
         else:
             raise NameError(f"Unknown controller type: {control_type}")
         # if self.cfg.domain_rand.randomize_torque_rfi:

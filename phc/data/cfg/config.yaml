@@ -4,6 +4,7 @@ defaults:
   - robot: smpl_humanoid
   - learning: amp_test
   - sim: default_sim
+  - control: default_control
 
 project_name: "SMPLOlympics"
 notes: "Default Notes"
