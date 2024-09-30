@@ -1079,10 +1079,7 @@ class Humanoid(BaseTask):
         pos = torch.tensor(get_axis_params(char_h, self.up_axis_idx)).to(self.device)
         pos[:2] += torch_rand_float(-1., 1., (2, 1), device=self.device).squeeze(1)  # ZL: segfault if we do not randomize the position
         
-        if self.humanoid_type in ["h1"]:
-            pos[2] = 1.05
-        elif self.humanoid_type in ["g1"]:
-            pos[2] = 0.77
+        pos[2] = self.cfg.robot.get("root_height", 0.93)
 
         humanoid_handles = []
         for i in range(self.num_agents):

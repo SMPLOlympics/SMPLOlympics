@@ -514,6 +514,7 @@ class HumanoidAMP(HumanoidZ):
     def _reset_ref_state_init(self, env_ids):
         num_envs = env_ids.shape[0]
         
+        
         root_pos_list, root_rot_list, dof_pos_list, root_vel_list, root_ang_vel_list, dof_vel_list, rb_pos_list, rb_rot_list, body_vel_list, body_ang_vel_list = [], [], [], [], [], [], [], [], [], []
         for i in range(self.num_agents):
             motion_ids, motion_times, root_pos, root_rot, dof_pos, root_vel, root_ang_vel, dof_vel, rb_pos, rb_rot, body_vel, body_ang_vel = self._sample_ref_state(env_ids)

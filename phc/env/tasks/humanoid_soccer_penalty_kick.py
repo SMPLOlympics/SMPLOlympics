@@ -46,8 +46,8 @@ class HumanoidSoccerPenaltyKick(humanoid_amp_task.HumanoidAMPTask):
         for i in range(self.num_agents):
             self._prev_root_pos_list.append(torch.zeros([self.num_envs, 3], device=self.device, dtype=torch.float))
         
-        # strike_body_names = cfg["env"]["strikeBodyNames"]
-        strikeBodyNames=["L_Knee","L_Ankle","L_Toe", "R_Knee","R_Ankle","R_Toe",]
+        
+        strikeBodyNames = self.cfg.env.get("strikeBodyNames", ["L_Knee","L_Ankle","L_Toe", "R_Knee","R_Ankle","R_Toe",])
         self._strike_body_ids = self._build_key_body_ids_tensor(strikeBodyNames)
         self._build_target_tensors()
         
@@ -261,10 +261,12 @@ class HumanoidSoccerPenaltyKick(humanoid_amp_task.HumanoidAMPTask):
     
     def _sample_ref_state(self, env_ids):
         motion_ids, motion_times, root_pos, root_rot, dof_pos, root_vel, root_ang_vel, dof_vel,  rb_pos, rb_rot, body_vel, body_ang_vel = super()._sample_ref_state(env_ids)
-
-        root_pos[:, :3] = torch.tensor([0.14, -4, 0.93]).to(self.device)
-        # root_pos[:, :3] = torch.tensor([0, -4, 0.93]).to(self.device)
-        root_rot[:] = torch.tensor([[0.    ,  0.    , -0.7071,  0.7071]]).to(self.device)
+        
+        root_pos[:, :3] = torch.tensor([0.14, -4, self.cfg.robot.get("root_height", 0.93)]).to(self.device)
+        if self._has_upright_start:
+            root_rot[:] = torch.tensor([[0.    ,  0.    , -0.7071,  0.7071]]).to(self.device)
+        else:
+            raise NotImplementedError
 
         root_vel[:] = 0
         root_ang_vel[:] = 0 

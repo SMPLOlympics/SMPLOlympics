@@ -37,9 +37,9 @@ dof_names: ['left_hip_yaw_link', 'left_hip_roll_link','left_hip_pitch_link', 'le
                    'right_hip_yaw_link', 'right_hip_roll_link', 'right_hip_pitch_link', 'right_knee_link', 'right_ankle_link',
                    'torso_link', 'left_shoulder_pitch_link', 'left_shoulder_roll_link', 'left_shoulder_yaw_link', 'left_elbow_link', 
                   'right_shoulder_pitch_link', 'right_shoulder_roll_link', 'right_shoulder_yaw_link', 'right_elbow_link']
-
 right_foot_name: 'right_ankle_link'
 left_foot_name: 'left_ankle_link'
+root_height: 1.05
 
 
 sim_with_urdf: True
