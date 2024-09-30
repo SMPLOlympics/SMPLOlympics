@@ -27,7 +27,7 @@ python phc/run_hydra.py \
 #### H1
 python phc/run_hydra.py \
     project_name=SMPLOlympics num_agents=1 \
-    learning=ppo exp_name=hurdle_ppo  \
+    learning=ppo exp_name=hurdle_ppo_h1  \
     env=env_amp_h1 env.num_envs=2048 env.task=HumanoidHurdle env.enableTaskObs=True env.shape_resampling_interval=1000 \
     robot=unitree_h1_nohead   learning.params.config.max_epochs=10000 \
     env.motion_file=./sample_data/h1_simplerun.pkl headless=True env.stateInit=Default env.episode_length=600
@@ -35,7 +35,17 @@ python phc/run_hydra.py \
 
 python phc/run_hydra.py \
     project_name=SMPLOlympics num_agents=1 \
-    learning=pulse exp_name=hurdle_pulse  \
+    learning=pulse exp_name=hurdle_pulse_h1  \
     env=env_amp_z_h1 env.num_envs=2048 env.task=HumanoidHurdleZ env.enableTaskObs=True env.shape_resampling_interval=1000 \
     robot=unitree_h1_nohead   learning.params.config.max_epochs=10000 \
     env.motion_file=./sample_data/h1_simplerun.pkl headless=True env.stateInit=Default env.episode_length=600
+
+
+#### G1
+
+python phc/run_hydra.py \
+    project_name=SMPLOlympics num_agents=1 \
+    learning=ppo exp_name=hurdle_ppo_g1  \
+    env=env_amp_g1 env.num_envs=2048 env.task=HumanoidHurdle env.enableTaskObs=True env.shape_resampling_interval=1000 \
+    robot=unitree_g1   learning.params.config.max_epochs=10000 \
+    env.motion_file=./sample_data/g1_simplerun.pkl headless=True env.stateInit=Default env.episode_length=600

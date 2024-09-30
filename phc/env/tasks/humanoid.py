@@ -1082,7 +1082,7 @@ class Humanoid(BaseTask):
         if self.humanoid_type in ["h1"]:
             pos[2] = 1.05
         elif self.humanoid_type in ["g1"]:
-            pos[2] = 0.75
+            pos[2] = 0.77
 
         humanoid_handles = []
         for i in range(self.num_agents):
