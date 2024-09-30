@@ -25,9 +25,6 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-Modified by Firas Al-Hafez 2024.
  -->
 
 <mujoco model="g1">
@@ -119,7 +116,7 @@ Modified by Firas Al-Hafez 2024.
               <inertial pos="0.005505 0.006534 -0.116629" quat="0.799234 -0.0128894 0.0354278 0.599836" mass="2.252" diaginertia="0.0127418 0.0124382 0.00192524"/>
               <joint name="left_knee_joint" pos="0 0 0" axis="0 1 0" range="-0.33489 2.5449"/>
               <geom type="mesh" class="visual" rgba="0.7 0.7 0.7 1" mesh="left_knee_link"/>
-              <geom size="0.015 0.075" class="collision" pos="0.007 0.005 -0.15" type="cylinder" rgba="0.7 0.7 0.7 1"/>
+              <geom type="mesh" class="collision" rgba="0.7 0.7 0.7 1" mesh="left_knee_link"/>
               <body name="left_ankle_pitch_link" pos="0 0.0040687 -0.30007" quat="0.99678 0 -0.0801788 0">
                 <inertial pos="-0.007269 0 0.011137" quat="0.603053 0.369225 0.369225 0.603053" mass="0.074" diaginertia="1.89e-05 1.40805e-05 6.9195e-06"/>
                 <joint name="left_ankle_pitch_joint" pos="0 0 0" axis="0 1 0" range="-0.68 0.73"/>
@@ -129,10 +126,7 @@ Modified by Firas Al-Hafez 2024.
                   <inertial pos="0.024762 2e-05 -0.012526" quat="0.000771333 0.734476 0.000921291 0.678634" mass="0.391" diaginertia="0.00110394 0.0010657 0.000149255"/>
                   <joint name="left_ankle_roll_joint" pos="0 0 0" axis="1 0 0" range="-0.2618 0.2618"/>
                   <geom type="mesh" class="visual" rgba="0.2 0.2 0.2 1" mesh="left_ankle_roll_link"/>
-                  <geom name="left_foot_1_col" class="collision" size="0.001" pos="-0.06 0.02 -0.03" rgba="0.2 0.2 0.2 1"/>
-                  <geom name="left_foot_2_col" class="collision" size="0.001" pos="-0.06 -0.02 -0.03" rgba="0.2 0.2 0.2 1"/>
-                  <geom name="left_foot_3_col" class="collision" size="0.001" pos="0.13 0.02 -0.03" rgba="0.2 0.2 0.2 1"/>
-                  <geom name="left_foot_4_col" class="collision" size="0.001" pos="0.13 -0.02 -0.03" rgba="0.2 0.2 0.2 1"/>
+                  <geom type="mesh" class="collision" rgba="0.2 0.2 0.2 1" mesh="left_ankle_roll_link"/>
                 </body>
               </body>
             </body>
@@ -158,7 +152,7 @@ Modified by Firas Al-Hafez 2024.
               <inertial pos="0.005505 -0.006534 -0.116629" quat="0.599836 0.0354278 -0.0128894 0.799234" mass="2.252" diaginertia="0.0127418 0.0124382 0.00192524"/>
               <joint name="right_knee_joint" pos="0 0 0" axis="0 1 0" range="-0.33489 2.5449"/>
               <geom type="mesh" class="visual" rgba="0.7 0.7 0.7 1" mesh="right_knee_link"/>
-              <geom size="0.015 0.075" class="collision" pos="0.007 -0.005 -0.15" type="cylinder" rgba="0.7 0.7 0.7 1"/>
+              <geom type="mesh" class="collision" rgba="0.7 0.7 0.7 1" mesh="right_knee_link"/>
               <body name="right_ankle_pitch_link" pos="0 -0.0040687 -0.30007" quat="0.99678 0 -0.0801788 0">
                 <inertial pos="-0.007269 0 0.011137" quat="0.603053 0.369225 0.369225 0.603053" mass="0.074" diaginertia="1.89e-05 1.40805e-05 6.9195e-06"/>
                 <joint name="right_ankle_pitch_joint" pos="0 0 0" axis="0 1 0" range="-0.68 0.73"/>
@@ -168,10 +162,7 @@ Modified by Firas Al-Hafez 2024.
                   <inertial pos="0.024762 -2e-05 -0.012526" quat="-0.000771333 0.734476 -0.000921291 0.678634" mass="0.391" diaginertia="0.00110394 0.0010657 0.000149255"/>
                   <joint name="right_ankle_roll_joint" pos="0 0 0" axis="1 0 0" range="-0.2618 0.2618"/>
                   <geom type="mesh" class="visual" rgba="0.2 0.2 0.2 1" mesh="right_ankle_roll_link"/>
-                  <geom name="right_foot_1_col" class="collision" size="0.001" pos="-0.06 0.02 -0.03" rgba="0.2 0.2 0.2 1"/>
-                  <geom name="right_foot_2_col" class="collision" size="0.001" pos="-0.06 -0.02 -0.03" rgba="0.2 0.2 0.2 1"/>
-                  <geom name="right_foot_3_col" class="collision" size="0.001" pos="0.13 0.02 -0.03" rgba="0.2 0.2 0.2 1"/>
-                  <geom name="right_foot_4_col" class="collision" size="0.001" pos="0.13 -0.02 -0.03" rgba="0.2 0.2 0.2 1"/>
+                  <geom type="mesh" class="collision" rgba="0.2 0.2 0.2 1" mesh="right_ankle_roll_link"/>
                 </body>
               </body>
             </body>

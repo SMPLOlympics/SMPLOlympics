@@ -1038,13 +1038,55 @@ class Humanoid(BaseTask):
         self.dof_limits_lower = to_torch(self.dof_limits_lower, device=self.device)
         self.dof_limits_upper = to_torch(self.dof_limits_upper, device=self.device)
         
-        if self.control_mode == "pd":
-            self.torque_limits = torch.ones_like(self.dof_limits_upper) * 350 # ZL: hacking 
+        if self.humanoid_type in ['h1', 'g1']:
+            self._process_dof_props(dof_prop)
+        
 
         if self.control_mode in ["pd", "isaac_pd"]:
             self._build_pd_action_offset_scale()
         return
+    
+    
+    def _process_dof_props(self, props):
+        """ Callback allowing to store/change/randomize the DOF properties of each environment.
+            Called During environment creation.
+            Base behavior: stores position, velocity and torques limits defined in the URDF
 
+        Args:
+            props (numpy.array): Properties of each DOF of the asset
+            env_id (int): Environment id
+
+        Returns:
+            [numpy.array]: Modified DOF properties
+        """
+        self.dof_pos_limits = torch.zeros(self.num_dof, 2, dtype=torch.float, device=self.device, requires_grad=False)
+        self.dof_vel_limits = torch.zeros(self.num_dof, dtype=torch.float, device=self.device, requires_grad=False)
+        self.torque_limits = torch.zeros(self.num_dof, dtype=torch.float, device=self.device, requires_grad=False)
+        for i in range(len(props)):
+            self.dof_pos_limits[i, 0] = props["lower"][i].item()
+            self.dof_pos_limits[i, 1] = props["upper"][i].item()
+            
+            if self.dof_pos_limits[i, 0] == 0 and self.dof_pos_limits[i, 1] == 0:
+                self.dof_pos_limits[i, 0] = -np.pi
+                self.dof_pos_limits[i, 1] = np.pi
+            
+            self.dof_vel_limits[i] = props["velocity"][i].item()
+            self.torque_limits[i] = props["effort"][i].item()
+            if self.torque_limits[i] > 100000:
+                
+                if "torque_limits_hard_coded" in self.__dict__:
+                    self.torque_limits[i] = self.torque_limits_hard_coded[i]
+                else:   
+                    self.torque_limits[i] = 350; print("No torque limit, set to 350")
+                
+            # soft limits
+            m = (self.dof_pos_limits[i, 0] + self.dof_pos_limits[i, 1]) / 2
+            r = self.dof_pos_limits[i, 1] - self.dof_pos_limits[i, 0]
+            self.dof_pos_limits[i, 0] = m - 0.5 * r * 1
+            self.dof_pos_limits[i, 1] = m + 0.5 * r * 1
+            
+        return props
+    
     def create_humanoid_force_sensors(self, humanoid_asset, sensor_joint_names):
         for jt in sensor_joint_names:
             right_foot_idx = self.gym.find_asset_rigid_body_index(humanoid_asset, jt)
@@ -1152,6 +1194,24 @@ class Humanoid(BaseTask):
                         1.5,              # Right elbow pitch
                         1.0,              # Right elbow roll
                         0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5   # Right hand (zero to six)
+                    ], device=self.device)
+                    
+                    self.torque_limits_hard_coded = to_torch([
+                        88, 88, 88,       # Left hip (pitch, roll, yaw)
+                        139,              # Left knee
+                        40, 40,           # Left ankle (pitch, roll)
+                        88, 88, 88,       # Right hip (pitch, roll, yaw)
+                        139,              # Right knee
+                        40, 40,           # Right ankle (pitch, roll)
+                        88,               # Torso
+                        20, 20, 20,       # Left shoulder (pitch, roll, yaw)
+                        20,               # Left elbow pitch
+                        20,               # Left elbow roll
+                        0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7,  # Left hand (zero to six)
+                        20, 20, 20,       # Right shoulder (pitch, roll, yaw)
+                        20,               # Right elbow pitch
+                        20,               # Right elbow roll
+                        0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7   # Right hand (zero to six)
                     ], device=self.device)
                     
                 self.p_gains, self.d_gains = to_torch(self.p_gains), to_torch(self.d_gains)
