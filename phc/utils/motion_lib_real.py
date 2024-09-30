@@ -1,5 +1,4 @@
 
-
 import numpy as np
 import os
 import yaml
@@ -10,6 +9,7 @@ from phc.utils import torch_utils
 import joblib
 import torch
 import torch.multiprocessing as mp
+# import multiprocessing as mp
 import copy
 import gc
 from smpl_sim.smpllib.smpl_parser import (
@@ -23,6 +23,10 @@ from phc.utils.flags import flags
 from phc.utils.motion_lib_base import MotionLibBase, DeviceCache, compute_motion_dof_vels, FixHeightMode
 from phc.utils.torch_humanoid_batch import Humanoid_Batch
 from easydict import EasyDict
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def to_torch(tensor):
     if torch.is_tensor(tensor):
@@ -116,26 +120,26 @@ class MotionLibReal(MotionLibBase):
             print(self.curr_motion_keys[:30], ".....")
         print("*********************************************************************************\n")
 
-
         motion_data_list = self._motion_data_list[sample_idxes.cpu().numpy()]
+        torch.set_num_threads(1)
         mp.set_sharing_strategy('file_descriptor')
+        
 
         manager = mp.Manager()
         queue = manager.Queue()
         num_jobs = min(mp.cpu_count(), 64)
 
-        if num_jobs <= 32 or not self.multi_thread:
+        if num_jobs <= 16 or not self.multi_thread:
             num_jobs = 1
         if flags.debug:
             num_jobs = 1
-        num_jobs = 1 
         
         res_acc = {}  # using dictionary ensures order of the results.
         jobs = motion_data_list
         chunk = np.ceil(len(jobs) / num_jobs).astype(int)
         ids = np.arange(len(jobs))
 
-        jobs = [(ids[i:i + chunk], jobs[i:i + chunk], skeleton_trees[i:i + chunk], gender_betas[i:i + chunk], self.fix_height, self.mesh_parsers, target_heading, max_len) for i in range(0, len(jobs), chunk)]
+        jobs = [(ids[i:i + chunk], jobs[i:i + chunk], skeleton_trees[i:i + chunk], gender_betas[i:i + chunk], self.fix_height, self.mesh_parsers, target_heading, max_len, self.m_cfg) for i in range(0, len(jobs), chunk)]
         job_args = [jobs[i] for i in range(len(jobs))]
         for i in range(1, len(jobs)):
             worker_args = (*job_args[i], queue, i)
@@ -144,8 +148,11 @@ class MotionLibReal(MotionLibBase):
         res_acc.update(self.load_motion_with_skeleton(*jobs[0], None, 0))
 
         for i in tqdm(range(len(jobs) - 1)):
-            res = queue.get()
-            res_acc.update(res)
+            try:
+                res = queue.get()
+                res_acc.update(res)
+            except Exception as e:
+                logging.error(f"Error in worker process {i}: {e}")
 
         for f in tqdm(range(len(res_acc))):
             motion_file_data, curr_motion = res_acc[f]
@@ -355,12 +362,12 @@ class MotionLibReal(MotionLibBase):
         return return_dict
         
     @staticmethod
-    def load_motion_with_skeleton(ids, motion_data_list, skeleton_trees, gender_betas, fix_height, mesh_parsers,  target_heading, max_len, queue, pid):
+    def load_motion_with_skeleton(ids, motion_data_list, skeleton_trees, gender_betas, fix_height, mesh_parsers,  target_heading, max_len, m_cfg, queue, pid):
         # ZL: loading motion with the specified skeleton. Perfoming forward kinematics to get the joint positions
         np.random.seed(np.random.randint(5000)* pid)
         res = {}
         assert (len(ids) == len(motion_data_list))
-        if pid == 0:
+        if pid == 0 and not m_cfg.multi_thread:
             pbar = tqdm(range(len(motion_data_list)))
         else:
             pbar = range(len(motion_data_list))
@@ -403,9 +410,10 @@ class MotionLibReal(MotionLibBase):
                 pose_aa[:, 0] = torch.tensor((heading_delta * sRot.from_rotvec(pose_aa[:, 0])).as_rotvec())
 
                 trans = torch.matmul(trans, torch.from_numpy(heading_delta.as_matrix().squeeze().T))
-
+            
             trans, trans_fix = MotionLibReal.fix_trans_height(pose_aa, trans, mesh_parsers, fix_height_mode = fix_height)
             curr_motion = mesh_parsers.fk_batch(pose_aa[None, ], trans[None, ], return_full= True, dt = dt)
+            
             curr_motion = EasyDict({k: v.squeeze() if torch.is_tensor(v) else v for k, v in curr_motion.items() })
             
             

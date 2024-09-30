@@ -1,5 +1,5 @@
 action_filter: False
-action_scale : 0.25
+action_scale : 1
 decimation : 4 # 4
 action_cutfreq : 4.0
 
