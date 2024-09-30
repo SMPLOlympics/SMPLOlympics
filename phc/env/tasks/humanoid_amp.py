@@ -409,7 +409,7 @@ class HumanoidAMP(HumanoidZ):
         return
 
     def _sample_time(self, motion_ids):
-        if self.humanoid_type in ['h1', 'smpl', 'smplh', 'smplx']:
+        if self.humanoid_type in ['h1', 'g1','smpl', 'smplh', 'smplx']:
             return self._motion_lib.sample_time_interval(motion_ids)
         else:
             return self._motion_lib.sample_time(motion_ids)

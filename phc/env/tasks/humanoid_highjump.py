@@ -82,7 +82,7 @@ class HumanoidHighjump(humanoid_amp_task.HumanoidAMPTask):
 
         initial_humanoid_root_states[..., 0] = 0
         initial_humanoid_root_states[..., 1] = 0
-        initial_humanoid_root_states[..., 2] = 1
+        initial_humanoid_root_states[..., 2] = self.cfg.robot.get("root_height", 0.93)
         initial_humanoid_root_states[..., 3] = 0
         initial_humanoid_root_states[..., 4] = 0
         initial_humanoid_root_states[..., 5] = 0
@@ -483,6 +483,7 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf, contact_body_id
         # first timestep can sometimes still have nonzero contact forces
         # so only check after first couple of steps
         has_failed *= (progress_buf > 1)
+        
         terminated = torch.where(has_failed, torch.ones_like(reset_buf), terminated)
 
     reset = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), terminated)
