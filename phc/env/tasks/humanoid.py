@@ -1161,7 +1161,7 @@ class Humanoid(BaseTask):
                     self.p_gains = to_torch([200.0, 200.0, 200.0, 300.0, 200.0, 200.0, 200.0, 200.0, 200.0, 300.0, 200.0, 200.0, 120.0, 40.0, 40.0, 40.0, 60.0, 40.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 40.0, 40.0, 40.0, 60.0, 40.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0], device=self.device)
                     self.d_gains = to_torch([5.0, 5.0, 5.0, 7.5, 5.0, 5.0, 5.0, 5.0, 5.0, 7.5, 5.0, 5.0, 3.0, 1.0, 1.0, 1.0, 1.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], device=self.device)
                 elif self.cfg.control.get("pd_v", 1) == 2:
-                    self.p_gains = to_torch([200.0, 200.0, 200.0, 300.0, 200.0, 200.0, 200.0, 200.0, 200.0, 300.0, 200.0, 200.0, 120.0, 40.0, 40.0, 40.0, 60.0, 40.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 40.0, 40.0, 40.0, 60.0, 40.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0], device=self.device)
+                    self.p_gains = to_torch([100.0, 100.0, 100.0, 150.0, 100.0, 100.0, 100.0, 100.0, 100.0, 150.0, 100.0, 100.0, 60.0, 20.0, 20.0, 20.0, 30.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 20.0, 20.0, 20.0, 30.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0], device=self.device)
                     self.d_gains = self.p_gains / 10
                     
                 self.torque_limits_hard_coded = to_torch([
@@ -1201,7 +1201,6 @@ class Humanoid(BaseTask):
                 if self.humanoid_type in ['h1', 'g1']:
                     dof_prop['stiffness'] = self.p_gains.numpy()
                     dof_prop['damping'] = self.d_gains.numpy()
-                    import ipdb; ipdb.set_trace()
 
             elif self.control_mode in ["pd", "force"]:
                 dof_prop["driveMode"] = gymapi.DOF_MODE_EFFORT
