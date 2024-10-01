@@ -2,5 +2,6 @@ action_filter: False
 action_scale : 1
 decimation : 4 # 4
 action_cutfreq : 4.0
+pd_v: 1
 
 control_mode: "pd"

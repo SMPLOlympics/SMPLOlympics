@@ -4,3 +4,4 @@ decimation : 2
 action_cutfreq : 4.0
 
 control_mode: "isaac_pd"
+pd_v: 1
