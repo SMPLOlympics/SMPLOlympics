@@ -1,6 +1,6 @@
 humanoid_type: h1
 bias_offset: False
-has_self_collision: False
+has_self_collision: True
 has_mesh: False
 has_jt_limit: False
 has_dof_subset: True

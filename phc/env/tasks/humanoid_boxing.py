@@ -293,6 +293,7 @@ class HumanoidBoxing(humanoid_amp_task.HumanoidAMPTask):
         return
 
     def _compute_reset(self):
+        
         #game_done = torch.logical_or(self.out_bound, torch.logical_or(self.red_win, self.green_win))
         self.reset_buf[:], self._terminate_buf[:] = compute_humanoid_reset(self.reset_buf, self.progress_buf,
                                                            self._contact_forces_list, self._contact_body_ids,

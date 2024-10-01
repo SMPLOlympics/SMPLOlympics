@@ -237,6 +237,7 @@ class HumanoidHurdle(humanoid_amp_task.HumanoidAMPTask):
         return
 
     def _compute_reset(self):
+        import ipdb; ipdb.set_trace()
         self.reset_buf[:], self._terminate_buf[:] = compute_humanoid_reset(self.reset_buf, self.progress_buf,
                                                            self._contact_forces_list, self._contact_body_ids,
                                                            self._rigid_body_pos_list, self.max_episode_length,

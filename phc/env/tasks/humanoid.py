@@ -1109,7 +1109,6 @@ class Humanoid(BaseTask):
         col_filter = 0
         if (self.humanoid_type in ['h1', 'g1', "smpl", "smplh", "smplx"] ) and (not self._has_self_collision):
             col_filter = 1
-        #check col_filter
         
 
         asset_file = self.cfg.robot.asset["assetFileName"]
@@ -1208,8 +1207,7 @@ class Humanoid(BaseTask):
             self.gym.set_actor_dof_properties(env_ptr, humanoid_handle, dof_prop)
         
 
-            if self.humanoid_type in ["smpl", "smplh", "smplx"] and self._has_self_collision:
-                # compliance_vals = [0.1] * 24
+            if self.humanoid_type in ['h1', 'g1', "smpl", "smplh", "smplx"] and self._has_self_collision:
                 # thickness_vals = [1.0] * 24
                 if self._has_mesh:
                     filter_ints = [0, 1, 224, 512, 384, 1, 1792, 64, 1056, 4096, 6, 6168, 0, 2048, 0, 20, 0, 0, 0, 0, 10, 0, 0, 0]
@@ -1218,6 +1216,10 @@ class Humanoid(BaseTask):
                         filter_ints = [0, 0, 7, 16, 12, 0, 56, 2, 33, 128, 0, 192, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                     elif self.humanoid_type in ["smplh", "smplx"]:
                         filter_ints = [0, 0, 7, 16, 12, 0, 56, 2, 33, 128, 0, 192, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    elif self.humanoid_type in ['h1']:
+                        filter_ints = [0, 2, 0, 2, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    elif self.humanoid_type in ['g1']:
+                        filter_ints = [0, 0, 32, 0, 128, 0, 128, 0, 16, 0, 64, 0, 64, 48, 1, 0, 1, 0, 8, 0, 8, 0, 0, 0, 0, 0, 2, 0, 2, 0, 4, 0, 4, 0, 0, 0, 0, 0]
                         
                 props = self.gym.get_actor_rigid_shape_properties(env_ptr, humanoid_handle)
                 
