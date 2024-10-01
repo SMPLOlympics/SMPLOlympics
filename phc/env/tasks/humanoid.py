@@ -1285,30 +1285,102 @@ class Humanoid(BaseTask):
         humanoid_limb_weight = torch.tensor(limb_lengths + masses)
         self.humanoid_limb_and_weights.append(humanoid_limb_weight)  # ZL: attach limb lengths and full body weight.
 
-        # if self.humanoid_type in ["smpl", "smplh", "smplx"]:
-        #     gender = self.humanoid_shapes[env_id, 0].long()
-        #     percentage = 1 - np.clip((humanoid_mass - 70) / 70, 0, 1)
-        #     if gender == 0:
-        #         gender = 1
-        #         color_vec = gymapi.Vec3(*get_color_gradient(percentage, "Greens"))
-        #     elif gender == 1:
-        #         gender = 2
-        #         color_vec = gymapi.Vec3(*get_color_gradient(percentage, "Blues"))
-        #     elif gender == 2:
-        #         gender = 0
-        #         color_vec = gymapi.Vec3(*get_color_gradient(percentage, "Reds"))
+        if self.humanoid_type in ['smpl', 'smplh', 'smplx']:
+            gender = self.humanoid_shapes[env_id, 0].long()
+            percentage = 1 - np.clip((humanoid_mass - 70) / 70, 0, 1)
+            if gender == 0:
+                gender = 1
+                color_vec = gymapi.Vec3(*get_color_gradient(percentage, "Greens"))
+            elif gender == 1:
+                gender = 2
+                color_vec = gymapi.Vec3(*get_color_gradient(percentage, "Blues"))
+            elif gender == 2:
+                gender = 0
+                color_vec = gymapi.Vec3(*get_color_gradient(percentage, "Reds"))
 
-        #     # color = torch.zeros(3)
-        #     # color[gender] = 1 - np.clip((humanoid_mass - 70) / 70, 0, 1)
-        #     if flags.test:
-        #         color_vec = gymapi.Vec3(*agt_color(env_id + 0))
-        #     # if env_id == 0:
-        #     #     color_vec = gymapi.Vec3(0.23192618223760095, 0.5456516724336793, 0.7626143790849673)
-        #     # elif env_id == 1:
-        #     #     color_vec = gymapi.Vec3(0.907912341407151, 0.20284505959246443, 0.16032295271049596)
-
-        # else:
-        #     color_vec = gymapi.Vec3(0.54, 0.85, 0.2)
+            # color = torch.zeros(3)
+            # color[gender] = 1 - np.clip((humanoid_mass - 70) / 70, 0, 1)
+            if flags.test:
+                color_vec = gymapi.Vec3(*agt_color(env_id + 0))
+            # if env_id == 0:
+            #     color_vec = gymapi.Vec3(0.23192618223760095, 0.5456516724336793, 0.7626143790849673)
+            # elif env_id == 1:
+            #     color_vec = gymapi.Vec3(0.907912341407151, 0.20284505959246443, 0.16032295271049596)
+            for j in range(self.num_bodies):
+                self.gym.set_rigid_body_color(env_ptr, humanoid_handle, j, gymapi.MESH_VISUAL, color_vec)
+        elif self.humanoid_type in ['h1']:
+            mesh_colors = [
+                [0.1, 0.1, 0.1],  # pelvis
+                [0.1, 0.1, 0.1],  # left_hip_yaw_link
+                [0.1, 0.1, 0.1],  # left_hip_roll_link
+                [0.1, 0.1, 0.1],  # left_hip_pitch_link
+                [0.1, 0.1, 0.1],  # left_knee_link
+                [0.1, 0.1, 0.1],  # left_ankle_link
+                [0.1, 0.1, 0.1],  # right_hip_yaw_link
+                [0.1, 0.1, 0.1],  # right_hip_roll_link
+                [0.1, 0.1, 0.1],  # right_hip_pitch_link
+                [0.1, 0.1, 0.1],  # right_knee_link
+                [0.1, 0.1, 0.1],  # right_ankle_link
+                [0.1, 0.1, 0.1],  # torso_link
+                [0.1, 0.1, 0.1],  # left_shoulder_pitch_link
+                [0.1, 0.1, 0.1],  # left_shoulder_roll_link
+                [0.1, 0.1, 0.1],  # left_shoulder_yaw_link
+                [0.1, 0.1, 0.1],  # left_elbow_link
+                [0.1, 0.1, 0.1],  # right_shoulder_pitch_link
+                [0.1, 0.1, 0.1],  # right_shoulder_roll_link
+                [0.1, 0.1, 0.1],  # right_shoulder_yaw_link
+                [0.1, 0.1, 0.1]   # right_elbow_link
+            ]
+            for j in range(self.num_bodies):
+                color_vec = gymapi.Vec3(*mesh_colors[j])
+                self.gym.set_rigid_body_color(env_ptr, humanoid_handle, j, gymapi.MESH_VISUAL, color_vec)
+                
+        elif self.humanoid_type in ['g1']:
+            geom_colors = [
+                [0.7, 0.7, 0.7],  # pelvis
+                [0.2, 0.2, 0.2],  # left_hip_pitch_link
+                [0.7, 0.7, 0.7],  # left_hip_roll_link
+                [0.7, 0.7, 0.7],  # left_hip_yaw_link
+                [0.7, 0.7, 0.7],  # left_knee_link
+                [0.7, 0.7, 0.7],  # left_ankle_pitch_link
+                [0.2, 0.2, 0.2],  # left_ankle_roll_link
+                [0.2, 0.2, 0.2],  # right_hip_pitch_link
+                [0.7, 0.7, 0.7],  # right_hip_roll_link
+                [0.7, 0.7, 0.7],  # right_hip_yaw_link
+                [0.7, 0.7, 0.7],  # right_knee_link
+                [0.7, 0.7, 0.7],  # right_ankle_pitch_link
+                [0.2, 0.2, 0.2],  # right_ankle_roll_link
+                [0.7, 0.7, 0.7],  # torso_link
+                [0.7, 0.7, 0.7],  # left_shoulder_pitch_link
+                [0.7, 0.7, 0.7],  # left_shoulder_roll_link
+                [0.7, 0.7, 0.7],  # left_shoulder_yaw_link
+                [0.7, 0.7, 0.7],  # left_elbow_pitch_link
+                [0.7, 0.7, 0.7],  # left_elbow_roll_link
+                [0.7, 0.7, 0.7],  # left_palm_link
+                [0.7, 0.7, 0.7],  # left_zero_link
+                [0.7, 0.7, 0.7],  # left_one_link
+                [0.7, 0.7, 0.7],  # left_two_link
+                [0.7, 0.7, 0.7],  # left_three_link
+                [0.7, 0.7, 0.7],  # left_four_link
+                [0.7, 0.7, 0.7],  # left_five_link
+                [0.7, 0.7, 0.7],  # left_six_link
+                [0.7, 0.7, 0.7],  # right_shoulder_pitch_link
+                [0.7, 0.7, 0.7],  # right_shoulder_roll_link
+                [0.7, 0.7, 0.7],  # right_shoulder_yaw_link
+                [0.7, 0.7, 0.7],  # right_elbow_pitch_link
+                [0.7, 0.7, 0.7],  # right_elbow_roll_link
+                [0.7, 0.7, 0.7],  # right_palm_link
+                [0.7, 0.7, 0.7],  # right_zero_link
+                [0.7, 0.7, 0.7],  # right_one_link
+                [0.7, 0.7, 0.7],  # right_two_link
+                [0.7, 0.7, 0.7],  # right_three_link
+                [0.7, 0.7, 0.7],  # right_four_link
+                [0.7, 0.7, 0.7],  # right_five_link
+                [0.7, 0.7, 0.7],  # right_six_link
+            ]
+            for j in range(self.num_bodies):
+                color_vec = gymapi.Vec3(*geom_colors[j])
+                self.gym.set_rigid_body_color(env_ptr, humanoid_handle, j, gymapi.MESH_VISUAL, color_vec)
 
         return
 

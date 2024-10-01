@@ -15,7 +15,7 @@ from isaacgym.torch_utils import *
 from scipy.spatial.transform import Rotation as sRot
 from phc.utils.flags import flags
 from enum import Enum
-from env.tasks.humanoid import dof_to_obs_smpl
+from env.tasks.humanoid import dof_to_obs_smpl, dof_to_obs
 
 TAR_ACTOR_ID = 1
 
@@ -46,14 +46,13 @@ class HumanoidBoxing(humanoid_amp_task.HumanoidAMPTask):
         for i in range(self.num_agents):
             self._prev_root_pos_list.append(torch.zeros([self.num_envs, 3], device=self.device, dtype=torch.float))
         
-        # strike_body_names = cfg["env"]["strikeBodyNames"]
-        strikeBodyNames=["L_Knee","L_Ankle","L_Toe", "R_Knee","R_Ankle","R_Toe",]
+        strikeBodyNames = cfg["env"].get("strikeBodyNames", ["L_Knee","L_Ankle","L_Toe", "R_Knee","R_Ankle","R_Toe",])
         self._strike_body_ids = self._build_key_body_ids_tensor(strikeBodyNames)
-        footNames=["L_Ankle", "L_Toe", "R_Ankle", "R_Toe"]
+        footNames = cfg["env"].get("footNames", ["L_Ankle", "L_Toe", "R_Ankle", "R_Toe"])
         self._foot_ids = self._build_key_body_ids_tensor(footNames)
-        handNames = ["L_Hand", "R_Hand"]
+        handNames = cfg["env"].get("handNames", ["L_Hand", "R_Hand"])
         self._hand_ids = self._build_key_body_ids_tensor(handNames)
-        targetNames = ["Pelvis", "Torso", "Spine", "Chest", "Neck", "Head"]
+        targetNames = cfg["env"].get("targetNames", ["Pelvis", "Torso", "Spine", "Chest", "Neck", "Head"])
         self._target_ids = self._build_key_body_ids_tensor(targetNames)
 
 
@@ -89,7 +88,10 @@ class HumanoidBoxing(humanoid_amp_task.HumanoidAMPTask):
     def get_task_obs_size(self):
         obs_size = 0
         if (self._enable_task_obs):
-            obs_size = 522
+            if self.humanoid_type in ['smpl','smplh', 'smplx']: 
+                obs_size = 522
+            elif self.humanoid_type in ['h1']:
+                obs_size = 285
         return obs_size
 
     def post_physics_step(self):
@@ -241,7 +243,7 @@ class HumanoidBoxing(humanoid_amp_task.HumanoidAMPTask):
         
             obs = compute_boxing_observation(root_states, body_pos, opponent_root_states[:, 0], opponent_body_pos[:, 0], opponent_body_rot[:, 0], 
                                              opponent_dof_pos[:, 0], opponent_dof_vel[:, 0], contact_force_norm, opponent_contact_force_norm[:, 0],
-                                             self._hand_ids, self._target_ids)                        
+                                             self._hand_ids, self._target_ids, self.humanoid_type)
             obs_list.append(obs)
         
         return obs_list
@@ -291,11 +293,6 @@ class HumanoidBoxing(humanoid_amp_task.HumanoidAMPTask):
         return
 
     def _compute_reset(self):
-        
-
-
-
-
         #game_done = torch.logical_or(self.out_bound, torch.logical_or(self.red_win, self.green_win))
         self.reset_buf[:], self._terminate_buf[:] = compute_humanoid_reset(self.reset_buf, self.progress_buf,
                                                            self._contact_forces_list, self._contact_body_ids,
@@ -395,11 +392,11 @@ class HumanoidBoxingZ(HumanoidBoxing):
 #####################################################################
 
 # borrow from NCP https://github.com/Tencent-RoboticsX/NCP/blob/master/ncp/env/tasks/humanoid_boxing.py
-@torch.jit.script
+# @torch.jit.script
 def compute_boxing_observation(self_root_state, self_body_pos, oppo_root_state, oppo_body_pos, oppo_body_rot,
                                   oppo_dof_pos, oppo_dof_vel, self_contact_norm, oppo_contact_norm,
-                                  hand_ids, target_ids):
-    # type: (Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor) -> Tensor
+                                  hand_ids, target_ids, humanoid_type):
+    # type: (Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, str) -> Tensor
     
     # root info
     self_root_pos = self_root_state[:, 0:3]
@@ -419,8 +416,12 @@ def compute_boxing_observation(self_root_state, self_body_pos, oppo_root_state, 
 
     local_oppo_vel = torch_utils.quat_rotate(heading_rot, oppo_root_vel)
     local_oppo_ang_vel = torch_utils.quat_rotate(heading_rot, oppo_root_ang_vel)
-
-    oppo_dof_obs = dof_to_obs_smpl(oppo_dof_pos)
+    
+    if humanoid_type in ['smpl','smplh', 'smplx']:
+        oppo_dof_obs = dof_to_obs_smpl(oppo_dof_pos)
+    elif humanoid_type in ['g1', 'h1']:
+        oppo_dof_obs = oppo_dof_pos
+        
     oppo_body_pos_diff = oppo_body_pos - self_root_pos[:, None]
     flat_oppo_body_pos_diff = oppo_body_pos_diff.view(oppo_body_pos_diff.shape[0] * oppo_body_pos_diff.shape[1],
                                               oppo_body_pos_diff.shape[2])
@@ -436,7 +437,6 @@ def compute_boxing_observation(self_root_state, self_body_pos, oppo_root_state, 
     local_flat_oppo_body_rot = torch_utils.quat_mul(flat_heading_rot, flat_oppo_body_rot)
     local_flat_oppo_body_rot = torch_utils.quat_to_tan_norm(local_flat_oppo_body_rot)
     local_flat_oppo_body_rot = local_flat_oppo_body_rot.view(oppo_body_rot.shape[0], oppo_body_rot.shape[1] * 6)
-
 
     self_hand_pos = self_body_pos[:, hand_ids, :].unsqueeze(-2)
     oppo_target_pos = oppo_body_pos[:, target_ids, :].unsqueeze(-3).repeat((1, self_hand_pos.shape[1], 1, 1))

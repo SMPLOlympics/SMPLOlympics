@@ -12,7 +12,7 @@ from isaacgym.torch_utils import *
 from scipy.spatial.transform import Rotation as sRot
 from phc.utils.flags import flags
 from enum import Enum
-from poselib.poselib.core.rotation3d import quat_inverse, quat_mul
+from smpl_sim.poselib.core.rotation3d import quat_inverse, quat_mul
 
 TAR_ACTOR_ID = 1
 
