@@ -68,3 +68,26 @@ The soccer goalpost asset comes from: https://sketchfab.com/3d-models/football-g
 The tennis net asset comes from: https://sketchfab.com/3d-models/tennis-court-02fae7583fb447a484ee5b7c76bef0e6
 The basketball hoop comes from: https://sketchfab.com/3d-models/canasta-baloncesto-basketball-hoop-bbef0dc4137b406f91709a692b338a3b
 
+## Citation
+If you find this work useful for your research, please cite our paper:
+```
+@article{luo2024smplolympics,
+  title={Smplolympics: Sports environments for physically simulated humanoids},
+  author={Luo, Zhengyi and Wang, Jiashun and Liu, Kangni and Zhang, Haotian and Tessler, Chen and Wang, Jingbo and Yuan, Ye and Cao, Jinkun and Lin, Zihui and Wang, Fengyi and others},
+  journal={arXiv preprint arXiv:2407.00187},
+  year={2024}
+}       
+```
+
+Also, the multi-agent environment is built upon the following prior work:
+
+```
+@inproceedings{wang2024strategy,
+  title={Strategy and skill learning for physics-based table tennis animation},
+  author={Wang, Jiashun and Hodgins, Jessica and Won, Jungdam},
+  booktitle={ACM SIGGRAPH 2024 Conference Papers},
+  pages={1--11},
+  year={2024}
+}
+```
+
